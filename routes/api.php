@@ -28,6 +28,7 @@ Route::prefix('v1')->group(function () {
 	Route::get("students/{id}", "StudentController@getData");
 
    Route::post("upload-image", "StudentController@uploadImage");
+   Route::post("edit-image", "StudentController@editImage");
    Route::post("test", "StudentController@test");
 
 });

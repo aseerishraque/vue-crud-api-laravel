@@ -42,7 +42,11 @@ class StudentController extends Controller
     {
         $obj = new Student();
         $obj->name = $request->name;
-        $obj->image = $request->image;
+
+        $imageName = time().'.'.$request->image->extension();  
+        $request->image->move(public_path('uploads'), $imageName);
+        
+        $obj->image = $imageName;
         $obj->description = $request->description;
         if($obj->save())
             return response()->json([
@@ -100,18 +104,24 @@ class StudentController extends Controller
         $obj = $obj->find($id);
         $deleted = 0;
 
-        if($obj->image != $request->image)
+
+        if($obj->image == $request->removeImage)
         {
             // $imageDir = public_path('uploads').'\\'.$request->image;
 
 
-           if (file_exists(public_path('uploads\\'.$obj->image)))
+           if (file_exists(public_path('uploads\\'.$request->removeImage)))
            {
-            unlink(public_path('uploads\\'.$obj->image));
+            unlink(public_path('uploads\\'.$request->removeImage));
                 $deleted = 1;
            }
+            
+           $imageName = time().'.'.$request->image->extension();  
+           $request->image->move(public_path('uploads'), $imageName);
+
+
         
-         $obj->image = $request->image; 
+         $obj->image = $imageName; 
         }
         
 
@@ -166,6 +176,7 @@ class StudentController extends Controller
     {
           $imageName = time().'.'.$request->image->extension();  
         
+
         if($request->image->move(public_path('uploads'), $imageName))
             return response()->json([
                 "data" => $imageName,
@@ -178,6 +189,37 @@ class StudentController extends Controller
                 "message" => "Image Upload Error!"
             ]);    
     }
+
+    public function editImage(Request $request)
+    {
+          $imageName = time().'.'.$request->image->extension();  
+            
+
+
+            
+            if (file_exists(public_path('uploads\\'.$request->removeImage)))
+           {
+            unlink(public_path('uploads\\'.$request->removeImage));
+                $deleted = 1;
+           }
+
+
+
+
+        if($request->image->move(public_path('uploads'), $imageName))
+            return response()->json([
+                "data" => $imageName,
+                "error" => false,
+                "message" => "Image Uploaded Successfully!"
+            ]);
+        else
+            return response()->json([
+                "error" => true,
+                "message" => "Image Upload Error!"
+            ]);    
+    }
+
+
 
 
     public function test(Request $request)
